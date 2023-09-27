@@ -1,0 +1,127 @@
+.my-calendar-container {
+    margin: 30px;
+    padding: 30px;
+    border: 1px solid rgb(130, 126, 126);
+    border-radius: 10px;
+}
+
+
+
+
+.timezone-selector {
+    margin-bottom: 20px;
+}
+
+.time-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.time-slot {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+}
+
+
+/* Add responsive styles for mobile view */
+@media (max-width: 767px) {
+    .popup-modal .time-slots {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .popup-modal .time-slot {
+        width: calc(50% - 10px);
+        /* Adjust the width as needed */
+        margin-bottom: 10px;
+    }
+}
+
+.popup-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border-radius: 5px;
+    max-width: 800px;
+    z-index: 9999;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    padding: 10px;
+    max-height: 80vh;
+    /* Set a maximum height for the popup */
+    overflow-y: auto;
+    
+}
+
+.modal-content{
+    border: none !important;
+}
+
+.close-button{
+    position: fixed;
+}
+
+/* Updated styles for time slots in the popup */
+.popup-modal .time-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 25px;
+    border-radius: 10px;
+    overflow-y: auto;
+    /* Enable vertical scrolling for time slots */
+    max-height: 100%;
+    /* Set a maximum height for the time slots */
+}
+
+.popup-modal .time-slot {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+    min-width: 120px;
+    /* Adjust the minimum width as needed */
+}
+
+@media (max-width: 767px) {
+    .popup-modal .time-slots {
+        justify-content: center !important;
+    }
+
+    .popup-modal {
+        width: 80% !important;
+    }
+    .rbc-calendar{
+        height: 420px !important;
+    }
+}
+
+/* @media (max-width: 767px) { */
+    .my-calendar-container {
+        margin: 0 !important;
+        position: fixed;
+        top: 50%; /* Position at vertical center */
+        left: 50%; /* Position at horizontal center */
+        transform: translate(-50%, -50%); /* Center align the container */
+        padding: 10px; /* Adjust padding as needed for mobile */
+        max-width: 95%; /* Limit the width for readability on mobile */
+        overflow-y: auto; /* Add scrolling if content exceeds screen height */
+    }
+/* } */
