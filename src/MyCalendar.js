@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment-timezone';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -102,20 +102,36 @@ const MyCalendar = () => {
         setIsPopupOpenn(false);
 
     };
+
+    const [timeZonesWithCurrentTime, setTimeZonesWithCurrentTime] = useState([]);
+
+    useEffect(() => {
+        const currentTimeZones = timeZones.map((tz) => {
+            const currentDateTime = moment().tz(tz.value);
+            return {
+                ...tz,
+                currentTime: currentDateTime.format('HH:mm:ss'),
+            };
+        });
+        setTimeZonesWithCurrentTime(currentTimeZones);
+    }, []);
+
     return (
         <>
 
             <div className="my-calendar-container">
                 <div className="timezone-selector">
-                    <label>Select Time Zone : </label>
+                    <label>Time Zone : </label>
+                    &nbsp;
                     <select
                         className="form-select"
                         value={selectedTimeZone}
                         onChange={handleTimeZoneChange}
+                        style={{width:"100%"}}
                     >
-                        {timeZones.map((tz) => (
+                        {timeZonesWithCurrentTime.map((tz) => (
                             <option key={tz.value} value={tz.value}>
-                                {tz.label}
+                                {tz.label} - ({tz.currentTime})
                             </option>
                         ))}
                     </select>
@@ -136,7 +152,7 @@ const MyCalendar = () => {
 
             {isPopupOpenn && (
 
-                <div className="popup-modal">
+                <div className="popup-modal" overlayClassName="popup-background-blur">
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="time-slots">
