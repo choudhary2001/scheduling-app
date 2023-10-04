@@ -1,54 +1,104 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { isAfter, startOfDay, isSameDay } from 'date-fns';
+import axios from 'axios';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment-timezone';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import SchedulePopup from './SchedulePopup';
 import './Calendar.css';
+import { useParams } from 'react-router-dom';
 
 const localizer = momentLocalizer(moment);
 
 const MyCalendar = () => {
-    const [selectedTimeZone, setSelectedTimeZone] = useState('America/New_York');
+    const [selectedTimeZone, setSelectedTimeZone] = useState(moment.tz.guess());
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isPopupOpenn, setIsPopupOpenn] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [timeSlots, setTimeSlots] = useState([]);
     const [selectedTime, setSelectedTime] = useState(null);
+    const [scheduleData, setScheduleData] = useState(null);
 
-    // Inside the handleTimeZoneChange function, reset selectedDate and timeSlots
+
     const handleTimeZoneChange = (event) => {
-        setSelectedTimeZone(event.target.value);
+        const newTimeZone = event.target.value;
+        setSelectedTimeZone(newTimeZone);
         setSelectedDate(null);
         setTimeSlots([]);
     };
 
-    // Add an onSelectDate function to handle date selection
+    const { username, event_link } = useParams();
+
+
+    useEffect(() => {
+
+        const apiUrl = `https://calendly.theworkflow.nyc/data/${username}/${event_link}`;
+
+        // Make the API request
+        axios.get(apiUrl)
+            .then(response => {
+                console.log(response.data);
+                setScheduleData(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching schedule data:', error);
+            });
+    }, [username, event_link]);
+
+
     const onSelectDate = (date) => {
         setSelectedDate(date);
-        setIsPopupOpenn(true);
+        if (scheduleData && scheduleData.days) {
+            const selectedDay = moment(date).format('dddd');
+            console.log(selectedDay);
+            const daySchedule = scheduleData.days.find(day => day.day === selectedDay);
+            console.log(daySchedule);
+            if (daySchedule && daySchedule.workday) {
+                const startTime = moment(daySchedule.startTime, 'h:mmA');
+                const endTime = moment(daySchedule.endTime, 'h:mmA');
 
-        const now = moment().tz(selectedTimeZone);
-        const selectedDateTime = moment(date).tz(selectedTimeZone);
+                const eventDurationText = scheduleData.data.event_duration;
+                const eventDurationMatch = eventDurationText.match(/\d+/);
+                const eventDurationMinutes = eventDurationMatch ? parseInt(eventDurationMatch[0]) : 0;
 
-        // Show time slots only for future times
-        if (selectedDateTime.isSameOrAfter(now, 'minute')) {
-            const timeSlots = [];
-            const startOfDay = moment(selectedDateTime).startOf('day');
-            for (let i = 0; i < 24 * 2; i++) {
-                const slotTime = moment(startOfDay).add(30 * i, 'minutes');
-                if (slotTime.isSameOrAfter(now, 'minute')) {
-                    timeSlots.push(slotTime);
+                const eventDuration = moment.duration(eventDurationMinutes, 'minutes');
+
+                const today = startOfDay(new Date());
+                const currentTime = new Date();
+
+                console.log(today, currentTime);
+
+                if (isSameDay(new Date(date), today)) {
+                    const timeSlots = [];
+                    while (startTime.isBefore(endTime)) {
+                        if (startTime.isAfter(currentTime)) {
+                            timeSlots.push(startTime.clone());
+                        }
+                        startTime.add(eventDuration);
+                    }
+                    console.log(timeSlots);
+                    setTimeSlots(timeSlots);
+                    setIsPopupOpenn(true);
+                } else if (isAfter(new Date(date), today)) {
+                    const timeSlots = [];
+                    while (startTime.isBefore(endTime)) {
+                        timeSlots.push(startTime.clone());
+                        startTime.add(eventDuration);
+                    }
+                    console.log(timeSlots);
+                    setTimeSlots(timeSlots);
+                    setIsPopupOpenn(true);
+                } else {
+                    setTimeSlots([]);
+                    setIsPopupOpenn(false);
                 }
+            } else {
+                setTimeSlots([]);
+                setIsPopupOpenn(false);
             }
-            setTimeSlots(timeSlots);
-        } else {
-            setTimeSlots([]);
-            setSelectedDate(null);
-            setIsPopupOpenn(false);
-
-
         }
     };
+
     const events = [
         {
             title: 'Event 1',
@@ -58,7 +108,7 @@ const MyCalendar = () => {
         // Add more events here
     ];
 
-    const timeZones = [
+    const timeZones = useMemo(() => [
         { value: 'Etc/GMT+12', label: 'GMT-12:00' },
         { value: 'Etc/GMT+11', label: 'GMT-11:00' },
         { value: 'Pacific/Honolulu', label: 'Hawaii-Aleutian Standard Time (HST)' },
@@ -84,7 +134,7 @@ const MyCalendar = () => {
         { value: 'Australia/Sydney', label: 'Australian Eastern Standard Time (AEST)' },
         { value: 'Pacific/Auckland', label: 'New Zealand Standard Time (NZST)' },
         // Add more time zones as needed
-    ];
+    ], []);
 
 
     const openPopup = (time) => {
@@ -110,15 +160,15 @@ const MyCalendar = () => {
             const currentDateTime = moment().tz(tz.value);
             return {
                 ...tz,
-                currentTime: currentDateTime.format('HH:mm:ss'),
+                currentTime: currentDateTime.format('h:mmA'),
             };
         });
         setTimeZonesWithCurrentTime(currentTimeZones);
-    }, []);
+    }, [timeZones]);
+
 
     return (
         <>
-
             <div className="my-calendar-container">
                 <div className="timezone-selector">
                     <label>Time Zone : </label>
@@ -127,7 +177,7 @@ const MyCalendar = () => {
                         className="form-select"
                         value={selectedTimeZone}
                         onChange={handleTimeZoneChange}
-                        style={{width:"100%"}}
+                        style={{ width: "100%" }}
                     >
                         {timeZonesWithCurrentTime.map((tz) => (
                             <option key={tz.value} value={tz.value}>
@@ -152,7 +202,7 @@ const MyCalendar = () => {
 
             {isPopupOpenn && (
 
-                <div className="popup-modal" overlayClassName="popup-background-blur">
+                <div className="popup-modal" overlayclassname="popup-background-blur">
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="time-slots">
@@ -162,7 +212,7 @@ const MyCalendar = () => {
                                         onClick={() => openPopup(time)}
                                         className="time-slot"
                                     >
-                                        {time.format('HH:mm A')}
+                                        {time.format('h:mmA')}
                                     </div>
                                 ))}
                             </div>
@@ -173,13 +223,14 @@ const MyCalendar = () => {
                 </div>
             )}
 
-            {isPopupOpen && selectedDate && (
+            {isPopupOpen && selectedDate && scheduleData && (
                 <SchedulePopup
                     isOpen={isPopupOpen}
                     onClose={handleClosePopup}
                     selectedDate={selectedDate}
                     selectedTime={selectedTime}
                     selectedTimeZone={selectedTimeZone}
+                    data={scheduleData.data}
                 />
             )}
         </>

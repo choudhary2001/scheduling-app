@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
 import moment from 'moment-timezone';
 import './SchedulePopup.css'; // Import your custom CSS for styling
 Modal.setAppElement('#root'); // Set the app element to the root div
 
 
-const SchedulePopup = ({ isOpen, onClose, selectedDate, selectedTime, selectedTimeZone }) => {
+const SchedulePopup = ({ isOpen, onClose, selectedDate, selectedTime, selectedTimeZone, data }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -40,6 +43,8 @@ const SchedulePopup = ({ isOpen, onClose, selectedDate, selectedTime, selectedTi
         // Add more time zones as needed
     ];
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleChange = (event) => {
         const { name, value } = event.target;
         setFormData({
@@ -48,25 +53,88 @@ const SchedulePopup = ({ isOpen, onClose, selectedDate, selectedTime, selectedTi
         });
     };
 
+
+    // ...
+
     const handleSubmit = (event) => {
         event.preventDefault();
-        // Handle form submission here (e.g., send data to the server)
-        console.log('Form data:', formData);
+        setIsLoading(true);
+
+        if (!formData.name || !formData.email) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Name and Email are required fields.',
+                timer: 3000,
+                showConfirmButton: false,
+            });
+            setIsLoading(false);
+
+            return; // Exit the function without submitting if fields are empty
+        }
+
+        // Prepare the JSON data to send
+        const postData = {
+            guest_name: formData.name,
+            guest_email: formData.email,
+            guest_notes: formData.description,
+            guest_date: moment(selectedDate).tz(selectedTimeZone).format('DD/MM/YYYY'),
+            guest_time: moment(selectedTime).tz(selectedTimeZone).format('HH:mm'),
+        };
+
+        // Define the API URL
+        const apiUrl = 'https://calendly.theworkflow.nyc/test06/hello';
+
+        // Send the POST request
+        axios.post(apiUrl, postData)
+            .then((response) => {
+                // Handle the response here if needed
+                console.log('Response:', response.data);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Event added successfully.',
+                    timer: 3000, // Auto-close after 3 seconds
+                    showConfirmButton: false, // Hide the "OK" button
+                });
+                onClose();
+
+            })
+            .catch((error) => {
+                // Handle errors here
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error,
+                    timer: 3000, // Auto-close after 3 seconds
+                    showConfirmButton: false, // Hide the "OK" button
+                });
+            })
+            .finally(() => {
+                // Set loading back to false after the request is complete
+                setIsLoading(false);
+            });
+
+
         // Close the modal after submission
-        onClose();
     };
 
-    const formattedDate = selectedDate ? moment(selectedDate).format('dddd, MMMM D, YYYY') : '';
-    // ...
+
+    const formattedDate = selectedDate ? moment(selectedDate).tz(selectedTimeZone).format('dddd, MMMM D, YYYY') : '';
+
+
+
+    const eventDurationText = data.event_duration;
+    const eventDurationMatch = eventDurationText.match(/\d+/); // Extracts numerical value
+    const eventDurationMinutes = eventDurationMatch ? parseInt(eventDurationMatch[0]) : 0;
+    console.log(selectedTime);
     const formattedTime = selectedTime
-        ? `${moment(selectedTime)
-            .tz(selectedTimeZone) // Format selected time in the selected timezone
-            .format('h:mmA')} - ${moment(selectedTime)
-                .tz(selectedTimeZone)
-                .add(30, 'minutes') // Add 30 minutes to the selected time
-                .format('h:mmA')}` // Format the resulting time
+        ? `${moment(selectedTime).tz(selectedTimeZone).format('h:mmA')} - ${moment(selectedTime)
+            .tz(selectedTimeZone)
+            .add(eventDurationMinutes, 'minutes')
+            .format('h:mmA')}`
         : '';
-    // ...
 
     const formattedTimeZone = selectedTimeZone
         ? timeZones.find((tz) => tz.value === selectedTimeZone)?.label || ''
@@ -84,7 +152,7 @@ const SchedulePopup = ({ isOpen, onClose, selectedDate, selectedTime, selectedTi
 
                     <div className="modal-header">
                         <p className="modal-subtitle">{formattedTimeZone}</p>
-                        <p className="modal-subtitle">30 Minute Meeting</p>
+                        <p className="modal-subtitle">{data.event_name}</p>
                         <p>{formattedTime}</p>
                         <p>{formattedDate}</p>
                     </div>
@@ -129,7 +197,9 @@ const SchedulePopup = ({ isOpen, onClose, selectedDate, selectedTime, selectedTi
                                     onChange={handleChange}
                                 />
                             </div>
-                            <button type="submit" className="btn btn-primary">Schedule</button>
+                            <button type="submit" className="btn btn-primary">
+                                {isLoading ? 'Submitting...' : 'Schedule'}
+                            </button>
                             <button onClick={onClose} className="btn btn-secondary close-button">x</button>
                         </form>
                     </div>
