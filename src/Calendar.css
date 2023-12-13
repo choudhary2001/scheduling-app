@@ -1,148 +1,228 @@
 .my-calendar-container {
-    margin: 0 !important;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 25px;
-    max-width: 95%;
-    overflow-y: auto;
-    border: 1px solid rgb(130, 126, 126);
-    border-radius: 10px;
-    box-shadow: 0 0 10px #736b6b;
+  margin: 0 !important;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 25px;
+  max-width: 95%;
+  overflow-y: auto;
+  border: 1px solid rgb(130, 126, 126);
+  border-radius: 10px;
+  box-shadow: 0 0 10px #736b6b;
 }
 
-
-
 .timezone-selector {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .time-slots {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 5px;
-    border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 5px;
+  border-radius: 10px;
 }
 
 .time-slot {
-    cursor: pointer;
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 16px;
+  cursor: pointer;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 16px;
 }
-
 
 /* Add responsive styles for mobile view */
 @media (max-width: 767px) {
-    .popup-modal .time-slots {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
+  .popup-modal .time-slots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
 
-    .popup-modal .time-slot {
-        width: calc(50% - 10px);
-        /* Adjust the width as needed */
-        margin-bottom: 10px;
-    }
+  .popup-modal .time-slot {
+    width: calc(50% - 10px);
+    /* Adjust the width as needed */
+    margin-bottom: 10px;
+  }
 
-    .my-calendar-container {
-        max-width: 100% !important;
-        width: 98% !important;
-    }
+  .my-calendar-container {
+    max-width: 100% !important;
+    width: 98% !important;
+  }
 }
 
 .popup-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    border-radius: 5px;
-    max-width: 85%;
-    z-index: 9999;
-    background-color: #fff;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    padding: 10px;
-    max-height: 90vh;
-    /* Set a maximum height for the popup */
-    overflow-y: auto;
-
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border-radius: 5px;
+  max-width: 85%;
+  z-index: 9999;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 10px;
+  max-height: 90vh;
+  /* Set a maximum height for the popup */
+  overflow-y: auto;
 }
 
 .modal-content {
-    border: none !important;
-    min-width: 100%;
+  border: none !important;
+  min-width: 100%;
 }
 
 .close-button {
-    position: fixed;
+  position: fixed;
 }
 
 /* Updated styles for time slots in the popup */
 .popup-modal .time-slots {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 25px;
-    border-radius: 10px;
-    overflow-y: auto;
-    /* Enable vertical scrolling for time slots */
-    max-height: 100%;
-    /* Set a maximum height for the time slots */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 25px;
+  border-radius: 10px;
+  overflow-y: auto;
+  /* Enable vertical scrolling for time slots */
+  max-height: 100%;
+  /* Set a maximum height for the time slots */
 }
 
 .popup-modal .time-slot {
-    cursor: pointer;
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 16px;
-    min-width: 120px;
-    /* Adjust the minimum width as needed */
+  cursor: pointer;
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 16px;
+  min-width: 120px;
+  /* Adjust the minimum width as needed */
 }
 
 @media (max-width: 767px) {
-    .popup-modal .time-slots {
-        justify-content: center !important;
-    }
+  .popup-modal .time-slots {
+    justify-content: center !important;
+  }
 
-    .popup-modal {
-        width: 95% !important;
-    }
+  .popup-modal {
+    width: 95% !important;
+  }
 
-    .rbc-calendar {
-        height: 420px !important;
-    }
+  .rbc-calendar {
+    height: 420px !important;
+  }
 }
-
 
 /* SchedulePopup.css */
 
 .popup-background-blur {
-    background: rgba(1, 1, 1, 0.3);
-    /* Adjust the opacity as needed */
-    backdrop-filter: blur(10px);
-    /* Adjust the blur amount as needed */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-    /* Adjust the z-index as needed */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.3s ease;
+  background: rgba(1, 1, 1, 0.3);
+  /* Adjust the opacity as needed */
+  backdrop-filter: blur(10px);
+  /* Adjust the blur amount as needed */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  /* Adjust the z-index as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
 }
+
+.popup-modal {
+  top: 0 !important;
+  left: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  transform: translate(0, 0) !important;
+}
+
+.rbc-day-bg,
+.rbc-month-view,
+.rbc-header,
+.rbc-month-row {
+  border: none !important;
+}
+
+.rbc-date-cell {
+  text-align: center !important;
+}
+
+.rbc-day-bg,
+.rbc-date-cell {
+  cursor: pointer;
+}
+
+.rbc-month-row {
+  justify-content: center;
+}
+
+.rbc-button-link {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.workday.future-day {
+  background-color: #faebd7;
+  color: #fff;
+}
+
+.rbc-day-bg {
+  border-radius: 100%;
+  margin: 3px;
+  padding: 0;
+}
+
+/* .rbc-day-bg {
+    z-index: 9 !important;
+} */
+
+.rbc-button-link {
+  color: black !important;
+}
+
+.rbc-off-range-bg {
+  background: transparent !important;
+}
+
+.rbc-date-cell {
+  cursor: pointer;
+  text-align: center;
+  z-index: -1;
+}
+
+.rbc-row {
+  cursor: pointer;
+}
+
+/* Add this to your CSS file */
+.available-date {
+  background-color: #faebd7; /* Set your desired color for available dates */
+  color: white; /* Set text color for available dates */
+}
+
+/* .unavailable-date {
+  background-color: blue;
+  color: white; 
+} */
